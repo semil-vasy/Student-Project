@@ -5,6 +5,7 @@ import java.util.List;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.DeleteMapping;
+import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -56,7 +57,7 @@ public class StudentController {
 
 	@GetMapping("{studentId}/{projectId}")
 	public ResponseEntity<?> getStudentById(@PathVariable long studentId, @PathVariable long projectId) {
-		try {
+	try {
 			return ResponseEntity.ok(studentService.assignProject(studentId, projectId));
 		} catch (Exception e) {
 			ApiResponse apiResponse = new ApiResponse(404, e.getMessage());
@@ -75,5 +76,6 @@ public class StudentController {
 			return ResponseEntity.ok(apiResponse);
 		}
 	}
+	
 
 }
