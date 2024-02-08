@@ -1,6 +1,5 @@
 package com.example.crud.controller;
 
-import java.io.IOException;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
@@ -23,12 +22,7 @@ public class UploadController {
 
 	@PostMapping("")
 	ResponseEntity<String> uploadFile(@RequestParam("file") MultipartFile file) {
-
-		try {
-			return ResponseEntity.ok(uploadService.uploadFile(file));
-		} catch (IOException e) {
-			return ResponseEntity.status(500).body(e.getMessage());
-		}
+		return ResponseEntity.ok(uploadService.uploadFile(file));
 	}
 
 	@GetMapping("/download/{fileName}")

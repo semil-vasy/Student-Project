@@ -9,6 +9,8 @@ public class ApiResponse {
 
 	private int status;
 	
-	private Object message;
+	private String message;
+	
+	private Object data;
 
 }

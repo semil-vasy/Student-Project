@@ -1,13 +1,14 @@
 package com.example.crud.service.impl;
 
-import java.util.ArrayList;
 import java.util.List;
 
+import org.modelmapper.ModelMapper;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import com.example.crud.dto.ProjectDto;
 import com.example.crud.dto.StudentDto;
+import com.example.crud.exception.ResourceNotFoundException;
 import com.example.crud.model.Project;
 import com.example.crud.model.Student;
 import com.example.crud.repository.StudentRepository;
@@ -23,81 +24,47 @@ public class StudentServiceImpl implements StudentService {
 	@Autowired
 	private ProjectService projectService;
 
+	@Autowired
+	private ModelMapper modelMapper;
+
 	@Override
 	public List<StudentDto> getAllStudent() {
 		List<Student> students = studentRepository.findAll();
-
-		List<StudentDto> studentsDto = new ArrayList<StudentDto>();
-
-		for (Student student : students) {
-			StudentDto dto = new StudentDto();
-			dto.setStudentId(student.getStudentId());
-			dto.setStudentName(student.getStudentName());
-			dto.setDateOfBirth(student.getDateOfBirth());
-			dto.setProject(student.getProject());
-
-			studentsDto.add(dto);
-		}
-		return studentsDto;
+		return students.stream().map(this::studentToDto).toList();
 	}
 
 	@Override
-	public StudentDto getStudentById(long studentId) throws Exception {
+	public StudentDto getStudentById(long studentId) {
 		Student student = studentRepository.findById(studentId)
-				.orElseThrow(() -> new Exception("No data found with Id : " + studentId));
-
-		StudentDto studentDto = new StudentDto();
-		studentDto.setStudentId(student.getStudentId());
-		studentDto.setStudentName(student.getStudentName());
-		studentDto.setDateOfBirth(student.getDateOfBirth());
-		studentDto.setProject(student.getProject());
-
-		return studentDto;
+				.orElseThrow(() -> new ResourceNotFoundException("No data found with Id : " + studentId));
+		return this.studentToDto(student);
 	}
 
 	@Override
 	public StudentDto addStudent(StudentDto studentDto) {
-		Student student = new Student();
+		Student student = studentRepository.save(this.dtoToStudent(studentDto));
+		return this.studentToDto(student);
+
+	}
+
+	@Override
+	public StudentDto updateStudent(long studentId, StudentDto studentDto) {
+		Student student = studentRepository.findById(studentId)
+				.orElseThrow(() -> new ResourceNotFoundException("No data found with Id : " + studentId));
 
 		student.setStudentName(studentDto.getStudentName());
 		student.setDateOfBirth(studentDto.getDateOfBirth());
 		student.setProject(studentDto.getProject());
 
 		Student newStudent = studentRepository.save(student);
-
-		try {
-			return getStudentById(newStudent.getStudentId());
-		} catch (Exception e) {
-			e.printStackTrace();
-		}
-		return studentDto;
-	}
-
-	@Override
-	public StudentDto updateStudent(long studentId, StudentDto studentDto) throws Exception {
-		Student student = studentRepository.findById(studentId)
-				.orElseThrow(() -> new Exception("No data found with Id : " + studentId));
-
-		if (studentDto.getStudentName() != null) {
-			student.setStudentName(studentDto.getStudentName());
-		}
-		if (studentDto.getDateOfBirth() != null) {
-			student.setDateOfBirth(studentDto.getDateOfBirth());
-		}
-		if (studentDto.getProject() != null) {
-			student.setProject(studentDto.getProject());
-		}
-
-		studentRepository.save(student);
-
-		return getStudentById(studentId);
+		return this.studentToDto(newStudent);
 
 	}
 
 	@Override
-	public StudentDto assignProject(long studentId, long projectId) throws Exception {
+	public StudentDto assignProject(long studentId, long projectId) {
 		Student student = studentRepository.findById(studentId)
-				.orElseThrow(() -> new Exception("No data found with Id : " + studentId));
+				.orElseThrow(() -> new ResourceNotFoundException("No data found with Id : " + studentId));
 
 		ProjectDto projectDto = projectService.getProjectById(projectId);
 
@@ -107,19 +74,24 @@ public class StudentServiceImpl implements StudentService {
 
 		student.setProject(project);
 
-		studentRepository.save(student);
-
-		return getStudentById(studentId);
+		Student newStudent = studentRepository.save(student);
+		return this.studentToDto(newStudent);
 
 	}
 
 	@Override
-	public void deleteStudent(long studentId) throws Exception {
-		try {
-			studentRepository.deleteById(studentId);
-		} catch (Exception e) {
-			throw new Exception(e.getMessage());
-		}
+	public void deleteStudent(long studentId) {
+		Student student = studentRepository.findById(studentId)
+				.orElseThrow(() -> new ResourceNotFoundException("No data found with Id : " + studentId));
+		studentRepository.delete(student);
+	}
+
+	Student dtoToStudent(StudentDto studentDto) {
+		return this.modelMapper.map(studentDto, Student.class);
+	}
+
+	StudentDto studentToDto(Student student) {
+		return this.modelMapper.map(student, StudentDto.class);
 	}
 
 }

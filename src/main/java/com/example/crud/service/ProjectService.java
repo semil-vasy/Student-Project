@@ -8,12 +8,12 @@ public interface ProjectService {
 
 	List<ProjectDto> getAllProject();
 
-	ProjectDto getProjectById(long projectId) throws Exception;
+	ProjectDto getProjectById(long projectId);
 
-	ProjectDto addProject(ProjectDto project);
+	ProjectDto addProject(ProjectDto projectDto);
 
-	ProjectDto updateProject(long projectId, ProjectDto project) throws Exception;
+	ProjectDto updateProject(long projectId, ProjectDto projectDto);
 
-	void deleteProject(long projectId) throws Exception;
+	void deleteProject(long projectId);
 
 }

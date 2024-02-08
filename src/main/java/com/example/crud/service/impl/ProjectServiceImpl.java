@@ -1,10 +1,12 @@
 package com.example.crud.service.impl;
 
-import java.util.ArrayList;
 import java.util.List;
+
+import org.modelmapper.ModelMapper;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import com.example.crud.dto.ProjectDto;
+import com.example.crud.exception.ResourceNotFoundException;
 import com.example.crud.model.Project;
 import com.example.crud.repository.ProjectRepository;
 import com.example.crud.service.ProjectService;
@@ -13,73 +15,55 @@ import com.example.crud.service.ProjectService;
 public class ProjectServiceImpl implements ProjectService {
 
 	@Autowired
-	ProjectRepository projectRepository;
+	private ProjectRepository projectRepository;
+
+	@Autowired
+	private ModelMapper modelMapper;
 
 	@Override
 	public List<ProjectDto> getAllProject() {
 		List<Project> projects = projectRepository.findAll();
-
-		List<ProjectDto> projectsDto = new ArrayList<ProjectDto>();
-
-		for (Project project : projects) {
-			ProjectDto dto = new ProjectDto();
-			dto.setProjectId(project.getProjectId());
-			dto.setProjectName(project.getProjectName());
-			projectsDto.add(dto);
-		}
-		return projectsDto;
+		return projects.stream().map(this::projectToDto).toList();
 	}
 
 	@Override
-	public ProjectDto getProjectById(long projectId) throws Exception {
+	public ProjectDto getProjectById(long projectId) {
 		Project project = projectRepository.findById(projectId)
-				.orElseThrow(() -> new Exception("No data found with Id : " + projectId));
-
-		ProjectDto projectDto = new ProjectDto();
-		projectDto.setProjectId(project.getProjectId());
-		projectDto.setProjectName(project.getProjectName());
-
-		return projectDto;
+				.orElseThrow(() -> new ResourceNotFoundException("No data found with Id : " + projectId));
+		return this.projectToDto(project);
 	}
 
 	@Override
 	public ProjectDto addProject(ProjectDto projectDto) {
-		Project project = new Project();
+		Project project = projectRepository.save(this.dtoToProject(projectDto));
+		return this.projectToDto(project);
+	}
+
+	@Override
+	public ProjectDto updateProject(long projectId, ProjectDto projectDto) {
+		Project project = projectRepository.findById(projectId)
+				.orElseThrow(() -> new ResourceNotFoundException("No data found with Id : " + projectId));
+
 		project.setProjectName(projectDto.getProjectName());
 
 		Project newProject = projectRepository.save(project);
+		return this.projectToDto(newProject);
 
-		try {
-			return getProjectById(newProject.getProjectId());
-		} catch (Exception e) {
-			e.printStackTrace();
-		}
-		return projectDto;
 	}
 
 	@Override
-	public ProjectDto updateProject(long projectId, ProjectDto projectDto) throws Exception {
+	public void deleteProject(long projectId) {
 		Project project = projectRepository.findById(projectId)
-				.orElseThrow(() -> new Exception("No data found with Id : " + projectId));
-		if (projectDto.getProjectName() != null) {
-			project.setProjectName(projectDto.getProjectName());
-		}
-		projectRepository.save(project);
-		try {
-			return getProjectById(projectId);
-		} catch (Exception e) {
-			e.printStackTrace();
-		}
-		return projectDto;
+				.orElseThrow(() -> new ResourceNotFoundException("No data found with Id : " + projectId));
+		projectRepository.delete(project);
 	}
 
-	@Override
-	public void deleteProject(long projectId) throws Exception {
-		try {
-			projectRepository.deleteById(projectId);
-		} catch (Exception e) {
-			throw new Exception(e.getMessage());
-		}
+	public Project dtoToProject(ProjectDto projectDto) {
+		return this.modelMapper.map(projectDto, Project.class);
+	}
+
+	public ProjectDto projectToDto(Project project) {
+		return this.modelMapper.map(project, ProjectDto.class);
 	}
 
 }

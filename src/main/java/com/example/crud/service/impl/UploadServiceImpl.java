@@ -15,6 +15,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
 import org.springframework.web.servlet.support.ServletUriComponentsBuilder;
 
+import com.example.crud.exception.ResourceNotFoundException;
 import com.example.crud.service.UploadService;
 
 @Service
@@ -23,7 +24,7 @@ public class UploadServiceImpl implements UploadService {
 	private static final String UPLOAD_DIR = "D:\\Java\\Upload";
 
 	@Override
-	public String uploadFile(MultipartFile file) throws IOException {
+	public String uploadFile(MultipartFile file)  {
 		String fileName;
 		try {
 
@@ -53,7 +54,7 @@ public class UploadServiceImpl implements UploadService {
 
 			return ("File uploaded successfully. Download URL: " + fileDownloadUri);
 		} catch (IOException ex) {
-			throw new IOException("Could not upload the file: " + ex.getMessage());
+			throw new ResourceNotFoundException("Could not upload the file: " + ex.getMessage());
 		}
 	}
 

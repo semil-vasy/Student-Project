@@ -8,14 +8,14 @@ public interface StudentService {
 
 	List<StudentDto> getAllStudent();
 
-	StudentDto getStudentById(long studentId) throws Exception;
+	StudentDto getStudentById(long studentId);
 
-	StudentDto addStudent(StudentDto student);
+	StudentDto addStudent(StudentDto studentDto);
 
-	StudentDto updateStudent(long studentId, StudentDto student) throws Exception;
+	StudentDto updateStudent(long studentId, StudentDto studentDto);
 
-	StudentDto assignProject(long studentId, long projectId) throws Exception;
+	void deleteStudent(long studentId);
 
-	void deleteStudent(long studentId) throws Exception;
+	StudentDto assignProject(long studentId, long projectId);
 
 }
