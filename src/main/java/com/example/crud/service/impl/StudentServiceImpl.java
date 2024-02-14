@@ -22,9 +22,6 @@ public class StudentServiceImpl implements StudentService {
 	private StudentRepository studentRepository;
 
 	@Autowired
-	private ProjectService projectService;
-
-	@Autowired
 	private ModelMapper modelMapper;
 
 	@Override
@@ -54,25 +51,6 @@ public class StudentServiceImpl implements StudentService {
 
 		student.setStudentName(studentDto.getStudentName());
 		student.setDateOfBirth(studentDto.getDateOfBirth());
-		student.setProject(studentDto.getProject());
-
-		Student newStudent = studentRepository.save(student);
-		return this.studentToDto(newStudent);
-
-	}
-
-	@Override
-	public StudentDto assignProject(long studentId, long projectId) {
-		Student student = studentRepository.findById(studentId)
-				.orElseThrow(() -> new ResourceNotFoundException("No data found with Id : " + studentId));
-
-		ProjectDto projectDto = projectService.getProjectById(projectId);
-
-		Project project = new Project();
-		project.setProjectId(projectDto.getProjectId());
-		project.setProjectName(projectDto.getProjectName());
-
-		student.setProject(project);
 
 		Student newStudent = studentRepository.save(student);
 		return this.studentToDto(newStudent);

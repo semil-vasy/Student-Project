@@ -16,6 +16,4 @@ public interface StudentService {
 
 	void deleteStudent(long studentId);
 
-	StudentDto assignProject(long studentId, long projectId);
-
 }

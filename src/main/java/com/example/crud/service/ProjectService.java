@@ -10,7 +10,7 @@ public interface ProjectService {
 
 	ProjectDto getProjectById(long projectId);
 
-	ProjectDto addProject(ProjectDto projectDto);
+	ProjectDto addProject(long studentId, ProjectDto projectDto);
 
 	ProjectDto updateProject(long projectId, ProjectDto projectDto);
 

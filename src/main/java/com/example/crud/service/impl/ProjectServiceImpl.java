@@ -2,6 +2,8 @@ package com.example.crud.service.impl;
 
 import java.util.List;
 
+import com.example.crud.model.Student;
+import com.example.crud.repository.StudentRepository;
 import org.modelmapper.ModelMapper;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -16,6 +18,9 @@ public class ProjectServiceImpl implements ProjectService {
 
 	@Autowired
 	private ProjectRepository projectRepository;
+
+	@Autowired
+	private StudentRepository studentRepository;
 
 	@Autowired
 	private ModelMapper modelMapper;
@@ -34,7 +39,9 @@ public class ProjectServiceImpl implements ProjectService {
 	}
 
 	@Override
-	public ProjectDto addProject(ProjectDto projectDto) {
+	public ProjectDto addProject(long studentId, ProjectDto projectDto) {
+		Student student = this.studentRepository.findById(studentId).orElseThrow(() -> new ResourceNotFoundException("No data found with Id : " + studentId));
+		projectDto.setStudent(student);
 		Project project = projectRepository.save(this.dtoToProject(projectDto));
 		return this.projectToDto(project);
 	}
@@ -55,7 +62,7 @@ public class ProjectServiceImpl implements ProjectService {
 	public void deleteProject(long projectId) {
 		Project project = projectRepository.findById(projectId)
 				.orElseThrow(() -> new ResourceNotFoundException("No data found with Id : " + projectId));
-		projectRepository.delete(project);
+		projectRepository.deleteById(project.getProjectId());
 	}
 
 	public Project dtoToProject(ProjectDto projectDto) {

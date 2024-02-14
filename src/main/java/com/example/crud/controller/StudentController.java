@@ -44,11 +44,6 @@ public class StudentController {
 		return ResponseEntity.ok(studentService.updateStudent(studentId, studentDto));
 	}
 
-	@GetMapping("{studentId}/{projectId}")
-	public ResponseEntity<StudentDto> getStudentById(@PathVariable long studentId, @PathVariable long projectId) {
-		return ResponseEntity.ok(studentService.assignProject(studentId, projectId));
-	}
-
 	@DeleteMapping("{id}")
 	public ResponseEntity<ApiResponse> deleteStudent(@PathVariable("id") long studentId) {
 		studentService.deleteStudent(studentId);

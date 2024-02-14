@@ -24,28 +24,29 @@ public class ProjectController {
 	@Autowired
 	ProjectService projectService;
 
-	@GetMapping("")
+	@GetMapping
 	public ResponseEntity<List<ProjectDto>> getAllProjects() {
 		return ResponseEntity.ok(projectService.getAllProject());
 	}
 
 	@GetMapping("{id}")
-	public ResponseEntity<?> getProjectById(@PathVariable("id") long projectId) {
-		return ResponseEntity.ok(projectService.getProjectById(projectId));
+	public ResponseEntity<ProjectDto> getProjectById(@PathVariable("id") long projectId) {
+		ProjectDto projectDto = projectService.getProjectById(projectId);
+		return ResponseEntity.ok(projectDto);
 	}
 
-	@PostMapping("")
-	public ResponseEntity<ProjectDto> saveProject(@RequestBody ProjectDto projectDto) {
-		return ResponseEntity.ok(projectService.addProject(projectDto));
+	@PostMapping("student/{studentId}")
+	public ResponseEntity<ProjectDto> saveProject(@PathVariable long studentId, @RequestBody ProjectDto projectDto) {
+		return ResponseEntity.ok(projectService.addProject(studentId,projectDto));
 	}
 
 	@PutMapping("{id}")
-	public ResponseEntity<?> updateProject(@PathVariable("id") long projectId, @RequestBody ProjectDto projectDto) {
+	public ResponseEntity<ProjectDto> updateProject(@PathVariable("id") long projectId, @RequestBody ProjectDto projectDto) {
 		return ResponseEntity.ok(projectService.updateProject(projectId, projectDto));
 	}
 
-	@DeleteMapping("{id}")
-	public ResponseEntity<ApiResponse> deleteProject(@PathVariable("id") long projectId) {
+	@DeleteMapping("{projectId}")
+	public ResponseEntity<ApiResponse> deleteProject(@PathVariable long projectId) {
 		projectService.deleteProject(projectId);
 		ApiResponse apiResponse = new ApiResponse(200, "Success", "Project Deleted Successfully");
 		return ResponseEntity.status(200).body(apiResponse);

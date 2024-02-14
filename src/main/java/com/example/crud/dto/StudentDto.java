@@ -13,5 +13,4 @@ public class StudentDto {
 
 	private Date dateOfBirth;
 
-	private Project project;
 }
